@@ -8,14 +8,10 @@ class ConsultationRequestAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "company_name",
-        "service",
-        "consultant",
         "created_at",
     )
 
     list_filter = (
-        "service",
-        "consultant",
         "created_at",
     )
 

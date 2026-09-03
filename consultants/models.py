@@ -1,16 +1,22 @@
 from django.db import models
 
+from services.models import ServiceCategory
+
 
 class Consultant(models.Model):
 
     name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
-    
+
     email = models.EmailField(
         unique=True,
         verbose_name="ایمیل"
     )
 
-    title = models.CharField(max_length=150, verbose_name="عنوان شغلی / تخصص اصلی")
+    services = models.ManyToManyField(
+        ServiceCategory,
+        related_name="consultants",
+        verbose_name="حوزه‌های تخصص"
+    )
 
     bio = models.TextField(verbose_name="بیوگرافی")
 
@@ -151,3 +157,35 @@ class ConsultantAvailability(models.Model):
         verbose_name = "زمان دسترسی مشاور"
         verbose_name_plural = "زمان‌های دسترسی مشاوران"
         ordering = ["day_of_week", "start_time"]
+
+
+class ConsultantService(models.Model):
+
+    consultant = models.ForeignKey(
+        Consultant,
+        on_delete=models.CASCADE,
+        related_name="consultant_services",
+        verbose_name="مشاور",
+    )
+
+    service = models.ForeignKey(
+        ServiceCategory,
+        on_delete=models.PROTECT,
+        related_name="consultant_services",
+        verbose_name="خدمت",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
+
+    def __str__(self):
+        return f"{self.consultant.name} - {self.service.title}"
+
+    class Meta:
+        verbose_name = "خدمت مشاور"
+        verbose_name_plural = "خدمات مشاوران"
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["consultant", "service"], name="unique_consultant_service"
+            )
+        ]
