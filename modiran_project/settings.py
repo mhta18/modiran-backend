@@ -34,6 +34,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 AUTH_USER_MODEL = "accounts.User"
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL")
 
 # Application definition
 
@@ -155,7 +156,7 @@ MAILERS = {
 }
 
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
-
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
@@ -177,8 +178,3 @@ STATIC_URL = "static/"
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}

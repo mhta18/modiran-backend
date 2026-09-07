@@ -1,5 +1,6 @@
 from django.db import models
 
+from services.models import ServiceCategory
 from consultants.models import ConsultantService
 
 
@@ -30,8 +31,27 @@ class BusinessIndustry(models.Model):
         verbose_name = "حوزه کسب‌وکار"
         verbose_name_plural = "حوزه‌های کسب‌وکار"
 
- 
+
 class ConsultationRequest(models.Model):
+
+    INDUSTRY_CHOICES = [
+        ("IT", "فناوری اطلاعات"),
+        ("MANUFACTURING", "تولیدی"),
+        ("FOOD", "صنایع غذایی"),
+        ("PHARMA", "دارویی"),
+        ("FINANCE", "مالی و بانکی"),
+        ("CONSTRUCTION", "ساختمان و عمران"),
+        ("OTHER", "سایر"),
+    ]
+
+    CONTACT_ROLE_CHOICES = [
+        ("CEO", "مدیرعامل"),
+        ("CEO_OFFICE", "دفتر مدیرعامل"),
+        ("HR", "مدیر منابع انسانی"),
+        ("FINANCE", "مدیر مالی"),
+        ("IT_MANAGER", "مدیر فناوری اطلاعات"),
+        ("OTHER", "سایر"),
+    ]
 
     company_name = models.CharField(max_length=150, verbose_name="نام سازمان / شرکت")
 
@@ -41,24 +61,30 @@ class ConsultationRequest(models.Model):
 
     phone = models.CharField(max_length=20, verbose_name="شماره تماس")
 
-    business_industry = models.ForeignKey(
-        BusinessIndustry,
-        on_delete=models.PROTECT,
-        related_name="consultation_requests",
-        verbose_name="حوزه فعالیت"
+    business_industry = models.CharField(
+        max_length=30, choices=INDUSTRY_CHOICES, verbose_name="حوزه فعالیت"
     )
 
-    contact_role = models.ForeignKey(
-        ContactRole,
+    contact_role = models.CharField(
+        max_length=30, choices=CONTACT_ROLE_CHOICES, verbose_name="سمت درخواست‌دهنده"
+    )
+
+    service = models.ForeignKey(
+        ServiceCategory,
         on_delete=models.PROTECT,
         related_name="consultation_requests",
-        verbose_name="سمت درخواست‌دهنده"
+        verbose_name="خدمت مورد نظر",
+        null=True,  
+        blank=True,
     )
+
     consultant_service = models.ForeignKey(
         ConsultantService,
         on_delete=models.PROTECT,
         related_name="consultation_requests",
         verbose_name="خدمت و مشاور انتخاب‌شده",
+        null=True,
+        blank=True,
     )
 
     description = models.TextField(verbose_name="شرح نیاز و عارضه‌های سازمان")
@@ -68,10 +94,11 @@ class ConsultationRequest(models.Model):
     )
 
     def __str__(self):
-        return (
-            f"درخواست {self.company_name} - "
-            f"{self.consultant_service.consultant.name}"
-        )
+        if self.consultant_service:
+            consultant_name = self.consultant_service.consultant.name
+            return f"درخواست {self.company_name} - {consultant_name}"
+
+        return f"درخواست {self.company_name} - درخواست عمومی"
 
     class Meta:
         verbose_name = "درخواست مشاوره"

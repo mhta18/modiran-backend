@@ -1,5 +1,8 @@
 from rest_framework import serializers
 
+from services.models import ServiceCategory
+from services.serializers import ServiceCategorySerializer
+
 from .models import (
     Consultant,
     Certification,
@@ -79,7 +82,6 @@ class ConsultantAvailabilitySerializer(serializers.ModelSerializer):
 
 class ConsultantSerializer(serializers.ModelSerializer):
 
-
     # Related objects
     certifications = CertificationSerializer(
         many=True,
@@ -130,12 +132,18 @@ class ConsultantSerializer(serializers.ModelSerializer):
 
 
 class ConsultantServiceSerializer(serializers.ModelSerializer):
-    service_title = serializers.CharField(source="service.title", read_only=True)
+    service = ServiceCategorySerializer(read_only=True)
+    service_id = serializers.PrimaryKeyRelatedField(
+        source="service", queryset=ServiceCategory.objects.all(), write_only=True
+    )
 
     class Meta:
         model = ConsultantService
         fields = [
             "id",
+            "consultant",
             "service",
-            "service_title",
+            "service_id",
+            "created_at",
         ]
+        read_only_fields = ["id", "created_at"]

@@ -14,8 +14,9 @@ class Consultant(models.Model):
 
     services = models.ManyToManyField(
         ServiceCategory,
+        through="ConsultantService",
         related_name="consultants",
-        verbose_name="حوزه‌های تخصص"
+        verbose_name="حوزه‌های تخصص",
     )
 
     bio = models.TextField(verbose_name="بیوگرافی")
