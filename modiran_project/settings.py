@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "events",
     "consultation_requests",
     "accounts",
+    "content",
 ]
 
 # Comma-separated in production, e.g.:
