@@ -88,15 +88,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "modiran_project.wsgi.application"
 
+import os
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("PGDATABASE"),
-        "USER": os.getenv("PGUSER"),
-        "PASSWORD": os.getenv("PGPASSWORD"),
-        "HOST": os.getenv("PGHOST"),
-        "PORT": os.getenv("PGPORT", "5432"),
-        "OPTIONS": {"sslmode": os.getenv("PGSSLMODE", "require")},
+        "ENGINE": os.getenv("DB_ENGINE"),
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+        "PORT": int(os.getenv("DB_PORT", 5432)),
+        "OPTIONS": {
+            "sslmode": os.getenv("DB_SSLMODE", "disable"),
+        },
     }
 }
 
