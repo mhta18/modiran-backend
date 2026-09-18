@@ -1,6 +1,6 @@
-bind = "0.0.0.0:8000"
+bind = "unix:/var/www/modiran-backend/modiran-backend/gunicorn.sock"
 
-workers = 2
+workers = 3
 
 timeout = 120
 
