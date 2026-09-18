@@ -1,3 +1,4 @@
+
 """Django settings for modiran_project."""
 
 import os
@@ -9,6 +10,8 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security / environment
+ENV_PATH = BASE_DIR / '.env'
+load_dotenv(dotenv_path=ENV_PATH)
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 if not SECRET_KEY:
@@ -34,6 +37,7 @@ INSTALLED_APPS = [
     "consultants",
     "services",
     "events",
+
     "consultation_requests",
     "accounts",
 ]
@@ -137,7 +141,7 @@ TIME_ZONE = os.getenv("TIME_ZONE", "UTC")
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "/static/"
+STATIC_URL = '/django-static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
