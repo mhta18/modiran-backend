@@ -8,18 +8,9 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security / environment
+DEBUG = True
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-
-if not SECRET_KEY:
-    raise RuntimeError("DJANGO_SECRET_KEY is not set")
-DEBUG = os.getenv("DEBUG", "True").lower() in ("1", "true", "yes", "on")
-
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
-    if host.strip()
-]
+# Security / environment
 
 AUTH_USER_MODEL = "accounts.User"
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
@@ -91,13 +82,15 @@ WSGI_APPLICATION = "modiran_project.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("PGDATABASE"),
-        "USER": os.getenv("PGUSER"),
-        "PASSWORD": os.getenv("PGPASSWORD"),
-        "HOST": os.getenv("PGHOST"),
-        "PORT": os.getenv("PGPORT", "5432"),
-        "OPTIONS": {"sslmode": os.getenv("PGSSLMODE", "require")},
+        "ENGINE": os.getenv("DB_ENGINE"),
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT", "5432"),
+        "OPTIONS": {
+            "sslmode": os.getenv("DB_SSLMODE", "require"),
+        },
     }
 }
 
