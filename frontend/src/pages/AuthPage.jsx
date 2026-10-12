@@ -8,26 +8,34 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
-  const [signUpData, setSignUpData] = useState({ username: '', email: '', password: '' });
+  // تغییر فیلد نام کاربری به ایمیل برای ورود
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+
+  // اضافه شدن فیلدهای نام و نام خانوادگی برای ثبت‌نام
+  const [signUpData, setSignUpData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: ''
+  });
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // ارسال درخواست لاگین (کوکی‌ها به صورت خودکار توسط مرورگر ذخیره می‌شوند)
       const response = await loginUser(loginData);
-      if (response?.data?.access || response?.data?.token) {
-        localStorage.setItem('userToken', response.data.access || response.data.token);
-      } else {
-        localStorage.setItem('userToken', 'mock_token_123');
-      }
-      alert('ورود با موفقیت انجام شد');
-      navigate('/dashboard');
+      console.log("Server response:", response.data);
+
+      navigate('/dashboard'); // هدایت به داشبورد
+
     } catch (err) {
-      console.error(err);
-      localStorage.setItem('userToken', 'mock_token_123');
-      alert('ورود با موفقیت انجام شد');
-      navigate('/dashboard');
+      console.error("Login error:", err.response?.data || err);
+      const errorMsg =
+        err.response?.data?.non_field_errors?.[0] ||
+        err.response?.data?.detail ||
+        'خطا در ورود: ایمیل یا رمز عبور اشتباه است.';
+      alert(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -38,40 +46,39 @@ const AuthPage = () => {
     setLoading(true);
     try {
       await registerUser(signUpData);
-      alert('حساب کاربری با موفقیت ساخته شد.');
-      setIsSignUp(false);
+      alert('حساب کاربری با موفقیت ساخته شد. اکنون می‌توانید وارد شوید.');
+      setIsSignUp(false); // انتقال به فرم ورود
     } catch (err) {
-      console.error(err);
-      alert('حساب کاربری ایجاد شد. می‌توانید وارد شوید.');
-      setIsSignUp(false);
+      console.error("Register error:", err.response?.data || err);
+      alert('خطا در ثبت‌نام. ممکن است ایمیل از قبل ثبت شده باشد یا اطلاعات ناقص باشد.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-wrapper">
+    <div className="auth-wrapper" dir="rtl">
       <div className={`auth-box ${isSignUp ? 'signup-mode' : ''}`}>
-        
-        {/* فرم ورود (سمت راست در حالت RTL) */}
+
+        {/* فرم ورود با ایمیل و رمز عبور */}
         <div className="form-panel signin-panel">
           <form onSubmit={handleLoginSubmit}>
             <h2>ورود به حساب کاربری</h2>
             <div className="field-group">
-              <label>نام کاربری یا ایمیل</label>
-              <input 
-                type="text" 
-                required 
-                value={loginData.username}
-                onChange={(e) => setLoginData({ ...loginData, username: e.target.value })}
-                placeholder="ایمیل یا نام کاربری خود را وارد کنید"
+              <label>آدرس ایمیل</label>
+              <input
+                type="email"
+                required
+                value={loginData.email}
+                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                placeholder="example@modiran.com"
               />
             </div>
             <div className="field-group">
               <label>رمز عبور</label>
-              <input 
-                type="password" 
-                required 
+              <input
+                type="password"
+                required
                 value={loginData.password}
                 onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                 placeholder="••••••••"
@@ -85,30 +92,40 @@ const AuthPage = () => {
               {loading ? 'در حال ورود...' : 'ورود به سیستم'}
             </button>
             <p className="toggle-hint">
-              حساب کاربری ندارید؟ <span onClick={() => setIsSignUp(true)}>ثبت‌نام کنید</span>
+              حساب کاربری ندارید؟ <span onClick={() => setIsSignUp(true)} style={{ cursor: 'pointer', color: '#139a9c', fontWeight: 'bold' }}>ثبت‌نام کنید</span>
             </p>
           </form>
         </div>
 
-        {/* فرم ثبت‌نام (سمت چپ در حالت RTL) */}
+        {/* فرم ثبت‌نام با نام، نام خانوادگی، ایمیل و رمز عبور */}
         <div className="form-panel signup-panel">
           <form onSubmit={handleSignUpSubmit}>
             <h2>ایجاد حساب جدید</h2>
             <div className="field-group">
-              <label>نام کاربری</label>
-              <input 
-                type="text" 
-                required 
-                value={signUpData.username}
-                onChange={(e) => setSignUpData({ ...signUpData, username: e.target.value })}
-                placeholder="نام کاربری دلخواه"
+              <label>نام</label>
+              <input
+                type="text"
+                required
+                value={signUpData.first_name}
+                onChange={(e) => setSignUpData({ ...signUpData, first_name: e.target.value })}
+                placeholder="نام خود را وارد کنید"
+              />
+            </div>
+            <div className="field-group">
+              <label>نام خانوادگی</label>
+              <input
+                type="text"
+                required
+                value={signUpData.last_name}
+                onChange={(e) => setSignUpData({ ...signUpData, last_name: e.target.value })}
+                placeholder="نام خانوادگی خود را وارد کنید"
               />
             </div>
             <div className="field-group">
               <label>آدرس ایمیل</label>
-              <input 
-                type="email" 
-                required 
+              <input
+                type="email"
+                required
                 value={signUpData.email}
                 onChange={(e) => setSignUpData({ ...signUpData, email: e.target.value })}
                 placeholder="example@modiran.com"
@@ -116,19 +133,19 @@ const AuthPage = () => {
             </div>
             <div className="field-group">
               <label>رمز عبور</label>
-              <input 
-                type="password" 
-                required 
+              <input
+                type="password"
+                required
                 value={signUpData.password}
                 onChange={(e) => setSignUpData({ ...signUpData, password: e.target.value })}
                 placeholder="حداقل ۸ کاراکتر"
               />
             </div>
             <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? 'در حال ثبت...' : 'ایجاد حساب کاربری'}
+              {loading ? 'در حال ثبت نام...' : 'ایجاد حساب کاربری'}
             </button>
             <p className="toggle-hint">
-              قبلاً ثبت‌نام کرده‌اید؟ <span onClick={() => setIsSignUp(false)}>وارد شوید</span>
+              قبلاً ثبت‌نام کرده‌اید؟ <span onClick={() => setIsSignUp(false)} style={{ cursor: 'pointer', color: '#139a9c', fontWeight: 'bold' }}>وارد شوید</span>
             </p>
           </form>
         </div>

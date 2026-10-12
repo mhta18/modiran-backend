@@ -1,35 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
-// آدرس عکس‌های خود را جایگزین کنید (از فولدر assets یا public)
-const solutions = [
-  {
-    id: 1,
-    image: "/images/solutions/iso9001-2.webp",
-    title: "استقرار سیستم‌های ایزو (ISO)",
-    description:
-      "طراحی، استقرار و بهبود سیستم‌های مدیریتی و استانداردهای بین‌المللی متناسب با نیاز سازمان.",
-    features: ["ISO 9001", "ISO 14001", "ISO 45001", "طراحی مستندات"],
-  },
-  {
-    id: 2,
-    image: "/images/solutions/erp.webp",
-    title: "عارضه‌یابی و راهکارهای ERP",
-    description:
-      "شناسایی چالش‌های سازمانی و ارائه راهکارهای عملی برای بهبود فرآیندها و یکپارچه‌سازی سیستم‌ها.",
-    features: ["تحلیل فرآیندها", "عارضه‌یابی سازمان", "بهینه‌سازی فرآیند", "ERP"],
-  },
-  {
-    id: 3,
-    image: "/images/solutions/event2.webp",
-    title: "سمینارها و دوره‌های آموزشی",
-    description:
-      "برگزاری دوره‌ها، کارگاه‌ها و سمینارهای تخصصی با حضور اساتید و مشاوران باتجربه.",
-    features: ["دوره‌های مدیریتی", "کارگاه‌های تخصصی", "سمینار سازمانی", "آموزش مدیران"],
-  },
-];
+import { getSolutions } from "../services/api";
 
 function SolutionsSection() {
+  const [solutions, setSolutions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchSolutions = async () => {
+      try {
+        setLoading(true);
+        const response = await getSolutions();
+        // Handle standard DRF list or paginated response (.results)
+        const data = response.data.results || response.data;
+        setSolutions(data);
+      } catch (err) {
+        console.error("Error fetching solutions:", err);
+        setError("خطا در دریافت اطلاعات راهکارها");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSolutions();
+  }, []);
+
+  // Helper to safely format features (whether returned as Array or String/CSV from DRF)
+  const parseFeatures = (features) => {
+    if (Array.isArray(features)) return features;
+    if (typeof features === "string") return features.split(",").map((f) => f.trim());
+    return [];
+  };
+
   return (
     <section id="solutions" className="solutions-section" dir="rtl">
       <div className="solutions-container">
@@ -39,53 +42,73 @@ function SolutionsSection() {
             راهکارهایی برای <span>رشد و توسعه سازمان</span>
           </h2>
           <p>
-            با کمک شبکه‌ای از مشاوران و متخصصان باتجربه، چالش‌های سازمان خود را شناسایی کرده و برای آن‌ها راهکارهای عملی و تخصصی دریافت کنید.
+            با کمک شبکه‌ای از مشاوران و متخصصان باتجربه، چالش‌های سازمان خود را
+            شناسایی کرده و برای آن‌ها راهکارهای عملی و تخصصی دریافت کنید.
           </p>
         </div>
 
-        <div className="solutions-grid">
-          {solutions.map((solution) => (
-            <article className="solution-card" key={solution.id}>
-              {/* بخش تصویر جایگزین آیکون شده است */}
-              <div
-                className="solution-image-wrapper"
-                style={{
-                  width: "100%",
-                  height: "200px",
-                  overflow: "hidden",
-                  borderRadius: "12px",
-                  marginBottom: "10px",
-                }}
-              >
-                <img
-                  src={solution.image}
-                  alt={solution.title}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-              </div>
+        {loading ? (
+          <div className="loading-spinner" style={{ textAlign: "center", padding: "40px" }}>
+            <p>در حال بارگذاری راهکارها...</p>
+          </div>
+        ) : error ? (
+          <div className="error-message" style={{ textAlign: "center", color: "#e11d48", padding: "20px" }}>
+            <p>{error}</p>
+          </div>
+        ) : (
+          <div className="solutions-grid">
+            {solutions.map((solution) => {
+              const featuresList = parseFeatures(solution.features);
+              // Ensure image URL handles both media paths and fallbacks
+              const imageUrl = solution.image || "/images/solutions/default.webp";
 
-              <h3>{solution.title}</h3>
-              <p>{solution.description}</p>
-              <div className="solution-features">
-                {solution.features.map((feature) => (
-                  <span key={feature}>
-                    <span className="feature-check">✓</span>
-                    {feature}
-                  </span>
-                ))}
-              </div>
-              <Link to="/consultants" className="solution-link">
-                مشاهده مشاوران
-                <span>←</span>
-              </Link>
-            </article>
-          ))}
-        </div>
+              return (
+                <article className="solution-card" key={solution.id}>
+                  <div
+                    className="solution-image-wrapper"
+                    style={{
+                      width: "100%",
+                      height: "200px",
+                      overflow: "hidden",
+                      borderRadius: "12px",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <img
+                      src={imageUrl}
+                      alt={solution.title}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </div>
+
+                  <h3>{solution.title}</h3>
+                  <p>{solution.description}</p>
+
+                  {featuresList.length > 0 && (
+                    <div className="solution-features">
+                      {featuresList.map((feature, idx) => (
+                        <span key={idx}>
+                          <span className="feature-check">✓</span>
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <Link to={`/consultants?solution=${solution.id}`} className="solution-link">
+                    مشاهده مشاوران
+                    <span>←</span>
+                  </Link>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

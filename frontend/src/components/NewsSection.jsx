@@ -1,51 +1,40 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
-const news = [
-  {
-    id: 1,
-    title: "نقش تحول دیجیتال در آینده سازمان‌ها",
-    category: "تحول دیجیتال",
-    date: "۲۵ شهریور ۱۴۰۵",
-    excerpt:
-      "بررسی تأثیر فناوری‌های جدید بر فرآیندهای سازمانی و تصمیم‌گیری مدیران.",
-    image:
-      "/images/news/digital.webp",
-  },
-  {
-    id: 2,
-    title: "چگونه فرآیندهای سازمانی خود را بهبود دهیم؟",
-    category: "مدیریت فرآیند",
-    date: "۱۸ شهریور ۱۴۰۵",
-    excerpt:
-      "نگاهی به روش‌های شناسایی نقاط ضعف و بهینه‌سازی فرآیندهای کسب‌وکار.",
-    image:
-      "/images/news/management.webp",
-  },
-  {
-    id: 3,
-    title: "اهمیت آموزش مستمر مدیران",
-    category: "آموزش",
-    date: "۱۰ شهریور ۱۴۰۵",
-    excerpt:
-      "چرا توسعه مهارت‌های مدیریتی باید بخشی از برنامه رشد هر سازمان باشد؟",
-    image:
-      "/images/news/teaching.webp",
-  },
-];
+import { getNews } from "../services/api";
 
 function NewsSection() {
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(true);
+        const response = await getNews();
+        // پشتیبانی از ساختار لیست معمولی یا صفحه‌بندی شده DRF (.results)
+        const data = response.data.results || response.data;
+        setNews(data);
+      } catch (err) {
+        console.error("Error fetching news:", err);
+        setError("خطا در دریافت اطلاعات اخبار و مقالات");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
+
   return (
     <section id="news" className="news-section" dir="rtl">
       <div className="news-container">
         <div className="news-header">
           <div>
             <span className="section-label">دانش و بینش</span>
-
             <h2>
               آخرین مطالب <span>مدیران</span>
             </h2>
-
             <p>
               مقالات، تحلیل‌ها و مطالب تخصصی در حوزه مدیریت و توسعه کسب‌وکار.
             </p>
@@ -57,35 +46,49 @@ function NewsSection() {
           </Link>
         </div>
 
-        <div className="news-grid">
-          {news.map((item) => (
-            <article className="news-card" key={item.id}>
-              <div className="news-image-wrapper">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="news-image"
-                />
-                <span className="news-category">{item.category}</span>
-              </div>
+        {loading ? (
+          <div className="loading-spinner" style={{ textAlign: "center", padding: "40px" }}>
+            <p>در حال بارگذاری مطالب...</p>
+          </div>
+        ) : error ? (
+          <div className="error-message" style={{ textAlign: "center", color: "#e11d48", padding: "20px" }}>
+            <p>{error}</p>
+          </div>
+        ) : (
+          <div className="news-grid">
+            {news.map((item) => {
+              const imageUrl = item.image || "/images/news/default.webp";
 
-              <div className="news-content">
-                <div className="news-meta">
-                  <span className="news-date">{item.date}</span>
-                </div>
+              return (
+                <article className="news-card" key={item.id}>
+                  <div className="news-image-wrapper">
+                    <img
+                      src={imageUrl}
+                      alt={item.title}
+                      className="news-image"
+                    />
+                    <span className="news-category">{item.category}</span>
+                  </div>
 
-                <h3>{item.title}</h3>
+                  <div className="news-content">
+                    <div className="news-meta">
+                      <span className="news-date">{item.date}</span>
+                    </div>
 
-                <p>{item.excerpt}</p>
+                    <h3>{item.title}</h3>
 
-                <Link to={`/news/${item.id}`} className="news-link">
-                  ادامه مطلب
-                  <span>←</span>
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+                    <p>{item.excerpt}</p>
+
+                    <Link to={`/news/${item.id}`} className="news-link">
+                      ادامه مطلب
+                      <span>←</span>
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );
