@@ -11,7 +11,6 @@ const AuthPage = () => {
   // تغییر فیلد نام کاربری به ایمیل برای ورود
   const [loginData, setLoginData] = useState({ email: '', password: '' });
 
-  // اضافه شدن فیلدهای نام و نام خانوادگی برای ثبت‌نام
   const [signUpData, setSignUpData] = useState({
     first_name: '',
     last_name: '',
