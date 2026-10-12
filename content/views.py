@@ -6,18 +6,14 @@ from rest_framework import viewsets
 from .models import (
     Solution,
     Book,
-    Course,
     News,
-    Media,
     Feedback,
 )
 
 from .serializers import (
     SolutionSerializer,
     BookSerializer,
-    CourseSerializer,
     NewsSerializer,
-    MediaSerializer,
     FeedbackSerializer,
 )
 
@@ -35,14 +31,6 @@ class BookViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Book.objects.filter(is_active=True).order_by("-created_at")
 
-
-class CourseViewSet(viewsets.ModelViewSet):
-    serializer_class = CourseSerializer
-
-    def get_queryset(self):
-        return Course.objects.filter(is_active=True).order_by("-created_at")
-
-
 class NewsViewSet(viewsets.ModelViewSet):
     serializer_class = NewsSerializer
 
@@ -50,14 +38,6 @@ class NewsViewSet(viewsets.ModelViewSet):
         return News.objects.filter(is_published=True).order_by(
             "-published_at", "-created_at"
         )
-
-
-class MediaViewSet(viewsets.ModelViewSet):
-    serializer_class = MediaSerializer
-
-    def get_queryset(self):
-        return Media.objects.filter(is_active=True).order_by("-created_at")
-
 
 class FeedbackViewSet(viewsets.ModelViewSet):
     serializer_class = FeedbackSerializer

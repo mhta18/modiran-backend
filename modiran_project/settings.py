@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -21,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
     "corsheaders",
     "django_filters",
     "consultants",
@@ -29,15 +31,14 @@ INSTALLED_APPS = [
     "consultation_requests",
     "accounts",
     "content",
+    "departments",
 ]
+CORS_ALLOW_CREDENTIALS = True
 
-# Comma-separated in production, e.g.:
-# CORS_ALLOWED_ORIGINS=https://modiran.com,https://www.modiran.com
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
         "CORS_ALLOWED_ORIGINS",
-        "http://localhost:3000,http://127.0.0.1:3000",
     ).split(",")
     if origin.strip()
 ]
@@ -93,9 +94,9 @@ DATABASES = {
 }
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
-    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "accounts.authentication.CookieJWTAuthentication",
+    ),
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
@@ -104,6 +105,12 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 AUTH_PASSWORD_VALIDATORS = [
