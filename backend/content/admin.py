@@ -5,9 +5,7 @@ from django.contrib import admin
 from .models import (
     Solution,
     Book,
-    Course,
     News,
-    Media,
     Feedback,
 )
 
@@ -37,19 +35,6 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ("title", "author")
 
 
-@admin.register(Course)
-class CourseAdmin(admin.ModelAdmin):
-    list_display = (
-        "title",
-        "instructor",
-        "duration",
-        "is_active",
-        "created_at",
-    )
-    list_filter = ("is_active",)
-    search_fields = ("title", "instructor")
-
-
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
     list_display = (
@@ -60,18 +45,6 @@ class NewsAdmin(admin.ModelAdmin):
     )
     list_filter = ("is_published",)
     search_fields = ("title", "summary", "content")
-
-
-@admin.register(Media)
-class MediaAdmin(admin.ModelAdmin):
-    list_display = (
-        "title",
-        "media_type",
-        "is_active",
-        "created_at",
-    )
-    list_filter = ("media_type", "is_active")
-    search_fields = ("title", "description")
 
 
 @admin.register(Feedback)
