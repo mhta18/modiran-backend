@@ -16,7 +16,7 @@ const getBaseUrl = () => {
     return `${window.location.protocol}//${window.location.host}/api/`;
   }
 
-  // حالت پیش‌فرض برای توسعه روی سیستم لوکال
+
   return "http://localhost:8000/api/";
 };
 
@@ -28,7 +28,7 @@ const api = axios.create({
   },
 });
 
-// Consultants
+
 export const getConsultants = (params = {}) =>
   api.get("consultants/", { params });
 
