@@ -1,11 +1,27 @@
 import axios from "axios";
 
-// Read the API base URL from the environment variable (Create React App requires REACT_APP_ prefix)
-// If Vite is used instead, use `import.meta.env.VITE_API_URL`
-const API_BASE_URL = "http://localhost:8000/api/";
+// تشخیص خودکار آدرس پایه بر اساس محیط اجرا
+const getBaseUrl = () => {
+  // اگر از Create React App استفاده می‌کنید:
+  if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  // اگر از Vite استفاده می‌کنید:
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+
+  // حالت پیش‌فرض بر اساس دامنه فعلی مرورگر (برای پروداکشن روی سرور)
+  if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+    return `${window.location.protocol}//${window.location.host}/api/`;
+  }
+
+  // حالت پیش‌فرض برای توسعه روی سیستم لوکال
+  return "http://localhost:8000/api/";
+};
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: getBaseUrl(),
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
