@@ -113,3 +113,15 @@ class ConsultantAvailabilityAdmin(admin.ModelAdmin):
     @admin.display(description="روز هفته")
     def day_name(self, obj):
         return obj.get_day_of_week_display()
+
+
+from django.contrib import admin
+from .models import ConsultantService
+
+
+@admin.register(ConsultantService)
+class ConsultantServiceAdmin(admin.ModelAdmin):
+    list_display = ("id", "consultant", "service", "created_at")
+    list_filter = ("service", "created_at")
+    search_fields = ("consultant__name", "service__title")
+    readonly_fields = ("created_at",)
