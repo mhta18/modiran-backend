@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("secure-management-portal/", admin.site.urls),
     # API endpoints
     path("api/", include("consultants.urls")),
     path("api/", include("services.urls")),
